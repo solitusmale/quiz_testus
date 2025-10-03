@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Register from "./components/register";
+import Login from "./components/login";
+import "./styles/app.css"; // uvoz stilova
 
 function App() {
+  const [showRegister, setShowRegister] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app-container">
+      {!showRegister ? (
+        <div>
+          <Login />
+          <div className="switch-link">
+            <button onClick={() => setShowRegister(true)} className="link-btn">
+              Nemate nalog? Registrujte se
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <Register />
+          <div className="switch-link">
+            <button onClick={() => setShowRegister(false)} className="link-btn">
+              Već imate nalog? Prijavite se
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

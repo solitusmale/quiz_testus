@@ -90,3 +90,34 @@
 .retry-btn:hover {
   background: #00cca3;
 }
+.answer-item {
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  border: 1px solid #555;
+  border-radius: 5px;
+}
+
+.answer-item.correct {
+  background-color: #28a745; /* zeleno */
+  color: #fff;
+}
+
+.answer-item.wrong {
+  background-color: #dc3545; /* crveno */
+  color: #fff;
+}
+
+.finish-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.finish-btn:hover {
+  background-color: #0056b3;
+}

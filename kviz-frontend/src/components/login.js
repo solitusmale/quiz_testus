@@ -1,7 +1,8 @@
+// src/components/Login.js
 import React, { useState } from "react";
-import "../styles/login.css"; // Import the CSS file
+import "../styles/login.css";
 
-function Login() {
+function Login({ onLogin }) { // <--- dodaj prop
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -11,9 +12,7 @@ function Login() {
 
     const res = await fetch("http://localhost/kviz/login.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
 
@@ -22,6 +21,7 @@ function Login() {
 
     if (data.success) {
       console.log("Korisnik:", data.user);
+      if (onLogin) onLogin(data.user); // <--- poziv callback-a
     }
   };
 

@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0d0d0d; /* crna pozadina */
+  color: #f5f5f5;           /* svetli tekst po defaultu */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Glavni kontejner za predmete */
+.subjects-container {
+  background-color: #532b4d; /* tamna pozadina kartice */
+  color: #ffffff;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Naslov sekcije */
+.subjects-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #ffffff;
+}
+
+/* Lista predmeta */
+.subjects-container ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Svaki predmet kao dugme */
+.subjects-container li button {
+  background-color: #1f1f2e; /* tamno-plava/siva */
+  color: #ffffff;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Hover efekat */
+.subjects-container li button:hover {
+  background-color: #3a3a5c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Poruka kada nema predmeta */
+.subjects-container p {
+  text-align: center;
+  font-size: 18px;
+  color: #bbbbbb;
+}

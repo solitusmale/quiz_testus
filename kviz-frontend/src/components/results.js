@@ -2,21 +2,27 @@
 import React from "react";
 import "../styles/results.css";
 
-function Results({ subject, results, onBack }) {
-  // results je niz objekata: { question_text, selected_answer, correct }
+function Results({ results, timeElapsed, onBack }) {
   const correctCount = results.filter(r => r.correct).length;
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${s}s`;
+  };
 
   return (
     <div className="results-container">
-      <h2>Rezultati - {subject.name}</h2>
-      <p>Tačni odgovori: {correctCount} / {results.length}</p>
+      <h2>Rezultati kviza</h2>
+      <p>Ukupno tačnih odgovora: {correctCount} / {results.length}</p>
+      <p>Vreme trajanja: {formatTime(timeElapsed)}</p>
 
       <ul className="results-list">
         {results.map((r, idx) => (
-          <li key={idx} className={`result-card ${r.correct ? "correct" : "wrong"}`}>
-            <p><strong>Pitanje:</strong> {r.question_text}</p>
-            <p><strong>Vaš odgovor:</strong> {r.selected_answer}</p>
-            <p><strong>Rezultat:</strong> {r.correct ? "Tačno ✅" : "Netačno ❌"}</p>
+          <li key={idx} className={`result-item ${r.correct ? "correct" : "wrong"}`}>
+            <strong>Pitanje:</strong> {r.question_text} <br/>
+            <strong>Vaš odgovor:</strong> {r.selected_answer || "Niste odgovorili"} <br/>
+            <strong>Status:</strong> {r.correct ? "Tačno" : "Pogrešno"}
           </li>
         ))}
       </ul>

@@ -90,3 +90,14 @@
 .back-btn:hover {
   background-color: #333;
 }
+.question-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.delete-btn {
+  margin-left: auto; /* gura ga skroz desno */
+}

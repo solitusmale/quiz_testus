@@ -117,3 +117,119 @@
 .admin-container .question-type label {
   margin-right: 20px;
 }
+.admin-container .questions-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-container .questions-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2a2a2a;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+.admin-container .delete-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.admin-container .delete-btn:hover {
+  background-color: #c62828;
+}
+.admin-container .edit-btn {
+  background-color: #ff9800;
+  color: #fff;
+  margin-left: 8px;
+}
+.admin-container .edit-btn:hover {
+  background-color: #fb8c00;
+}
+/* src/styles/admin.css */
+
+/* Overlay za modal */
+.admin-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal box */
+.admin-container .modal {
+  background-color: #1a1a1a;
+  padding: 25px;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* Naslov */
+.admin-container .modal h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Form fields */
+.admin-container .modal textarea,
+.admin-container .modal input[type="text"],
+.admin-container .modal select {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #f5f5f5;
+  font-size: 1rem;
+}
+
+/* Dugmad unutar modala */
+.admin-container .modal .save-btn {
+  background-color: #4caf50;
+  color: #fff;
+  margin-top: 10px;
+}
+.admin-container .modal .save-btn:hover {
+  background-color: #45a049;
+}
+
+.admin-container .modal .cancel-btn {
+  background-color: #9e9e9e;
+  color: #fff;
+  margin-left: 8px;
+}
+.admin-container .modal .cancel-btn:hover {
+  background-color: #757575;
+}
+
+/* Answer row u modal formi */
+.admin-container .modal .answer-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.admin-container .modal .answer-group input[type="text"] {
+  flex: 1;
+}

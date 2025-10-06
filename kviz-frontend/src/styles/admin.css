@@ -1,0 +1,119 @@
+/* src/styles/admin.css */
+
+.admin-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background-color: #1a1a1a;
+  color: #f5f5f5;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-right: 55px;
+}
+
+.admin-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.admin-container select,
+.admin-container textarea,
+.admin-container input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #222;
+  color: #f5f5f5;
+  font-size: 1rem;
+}
+
+.admin-container textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.admin-container label {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+.admin-container label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.admin-container button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  margin-top: 10px;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.admin-container button:hover {
+  background-color: #45a049;
+}
+
+.admin-container .remove-btn {
+  background-color: #e53935;
+  margin-left: 8px;
+}
+
+.admin-container .remove-btn:hover {
+  background-color: #d32f2f;
+}
+
+.admin-container .answer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.admin-container .answer-row input[type="text"] {
+  flex: 1;
+}
+
+.admin-container .message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.admin-container .message.success {
+  background-color: #388e3c;
+  color: #fff;
+}
+
+.admin-container .message.error {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.admin-container .back-btn {
+  background-color: #1976d2;
+  margin-bottom: 15px;
+}
+
+.admin-container .back-btn:hover {
+  background-color: #1565c0;
+}
+
+.admin-container .question-type {
+  margin-bottom: 15px;
+}
+
+.admin-container .question-type label {
+  margin-right: 20px;
+}

@@ -1,11 +1,13 @@
 // src/components/Login.js
 import React, { useState } from "react";
 import "../styles/login.css";
+import Register from "./register"; // import Register
 
-function Login({ onLogin }) { // <--- dodaj prop
+function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showRegister, setShowRegister] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,10 +22,29 @@ function Login({ onLogin }) { // <--- dodaj prop
     setMessage(data.message);
 
     if (data.success) {
-      console.log("Korisnik:", data.user);
-      if (onLogin) onLogin(data.user); // <--- poziv callback-a
+      if (onLogin) onLogin(data.user);
     }
   };
+
+  const handleRegisterSuccess = (token, username) => {
+    if (onLogin) onLogin({ api_token: token, username: username, role: "user" });
+  };
+
+if (showRegister) {
+  return (
+    <div className="login-container">
+      <div className="register-box">
+        <Register onRegisterSuccess={handleRegisterSuccess} />
+        <div className="switch-link">
+          <button onClick={() => setShowRegister(false)} className="link-btn">
+            Već imate nalog? Prijavite se
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
   return (
     <div className="login-container">
@@ -46,11 +67,14 @@ function Login({ onLogin }) { // <--- dodaj prop
             required
             className="login-input"
           />
-          <button type="submit" className="login-button">
-            Prijavi se
-          </button>
+          <button type="submit" className="login-button">Prijavi se</button>
         </form>
         {message && <p className="login-message">{message}</p>}
+        <div className="switch-link">
+          <button onClick={() => setShowRegister(true)} className="link-btn">
+            Nemate nalog? Registrujte se
+          </button>
+        </div>
       </div>
     </div>
   );

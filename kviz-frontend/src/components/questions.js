@@ -5,21 +5,26 @@ import "../styles/questions.css";
 function Questions({ subject, token, onBack, onFinish }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAnswers, setSelectedAnswers] = useState({}); // čuva izabrane odgovore
-  const [timeElapsed, setTimeElapsed] = useState(0); // u sekundama
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [showResult, setShowResult] = useState(false);
+  const [timeElapsed, setTimeElapsed] = useState(0); // tajmer u sekundama
 
   useEffect(() => {
-    // učitavanje pitanja
-    fetch(`http://localhost/kviz/api/get_questions.php?subject_id=${subject.subject_id}&token=${token}`)
-      .then(res => res.json())
-      .then(data => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost/kviz/api/get_questions.php?subject_id=${subject.subject_id}&token=${token}`
+        );
+        const data = await res.json();
         setQuestions(data.questions || []);
+      } catch (err) {
+        console.error("Greška pri učitavanju pitanja:", err);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      }
+    };
+    fetchQuestions();
 
     // start tajmera
     const timer = setInterval(() => {
@@ -29,46 +34,100 @@ function Questions({ subject, token, onBack, onFinish }) {
     return () => clearInterval(timer); // stop tajmera kad komponenta unmount
   }, [subject, token]);
 
-  const handleAnswerClick = async (question_id, answer_id) => {
-    if (selectedAnswers[question_id]) return; // već je izabran
+  if (loading) return <p style={{ textAlign: "center" }}>Učitavanje pitanja...</p>;
+  if (!questions.length) return <p style={{ textAlign: "center" }}>Nema pitanja za ovaj predmet</p>;
+
+  const currentQuestion = questions[currentIndex];
+  const userSelection = selectedAnswers[currentQuestion.question_id] || { answerIds: [] };
+
+  const handleAnswerClick = (answer_id) => {
+    if (showResult) return;
+
+    // Single choice
+    if (currentQuestion.question_type === "single") {
+      setSelectedAnswers(prev => ({
+        ...prev,
+        [currentQuestion.question_id]: { answerIds: [answer_id] }
+      }));
+    } else {
+      // Multiple choice
+      setSelectedAnswers(prev => {
+        const existing = prev[currentQuestion.question_id]?.answerIds || [];
+        const updated = existing.includes(answer_id)
+          ? existing.filter(id => id !== answer_id)
+          : [...existing, answer_id];
+        return {
+          ...prev,
+          [currentQuestion.question_id]: { answerIds: updated }
+        };
+      });
+    }
+  };
+
+  const handleCheckNext = async () => {
+    const answerIds = selectedAnswers[currentQuestion.question_id]?.answerIds || [];
+    if (!answerIds.length) return alert("Odaberite bar jedan odgovor!");
 
     try {
-      const res = await fetch(`http://localhost/kviz/api/check_answers.php?answer_id=${answer_id}`);
-      const data = await res.json();
+      const res = await Promise.all(
+        answerIds.map(id =>
+          fetch(`http://localhost/kviz/api/check_answers.php?answer_id=${id}`).then(r => r.json())
+        )
+      );
+
+      const correctAnswers = res
+        .filter(r => r.correct)
+        .map((_, i) => answerIds[i]);
 
       setSelectedAnswers(prev => ({
         ...prev,
-        [question_id]: {
-          answer_id,
-          correct: data.correct,
-          answer_text: data.answer_text
+        [currentQuestion.question_id]: {
+          ...prev[currentQuestion.question_id],
+          correctAnswers
         }
       }));
+
+      setShowResult(true);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleFinishQuiz = () => {
-    const results = questions.map(q => ({
-      question_id: q.question_id,
-      question_text: q.question_text,
-      selected_answer: selectedAnswers[q.question_id]?.answer_text || null,
-      correct: selectedAnswers[q.question_id]?.correct || false
-    }));
+const handleNextQuestion = () => {
+  setShowResult(false);
+  if (currentIndex + 1 < questions.length) {
+    setCurrentIndex(currentIndex + 1);
+  } else {
+    // kraj kviza
+    const results = questions.map(q => {
+      const sel = selectedAnswers[q.question_id] || {};
+      const selectedIds = sel.answerIds || [];
+      const correctIds = sel.correctAnswers || [];
 
-    onFinish(results, timeElapsed); // prosleđujemo rezultate i trajanje
-  };
+      const selectedText = q.answers
+        .filter(a => selectedIds.includes(a.answer_id))
+        .map(a => a.answer_text)
+        .join(", ") || null;
+
+      return {
+        question_id: q.question_id,
+        question_text: q.question_text,
+        selected_answers: selectedIds,
+        selected_text: selectedText,
+        correct_answers: correctIds,
+        correct: correctIds.length === selectedIds.length && correctIds.every(id => selectedIds.includes(id))
+      };
+    });
+    onFinish(results, timeElapsed);
+  }
+};
+
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}m ${s}s`;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2,'0')}`;
   };
-
-  if (loading) return <p style={{ textAlign: "center" }}>Učitavanje pitanja...</p>;
-
-  const allAnswered = questions.length && Object.keys(selectedAnswers).length === questions.length;
 
   return (
     <div className="questions-container">
@@ -76,41 +135,38 @@ function Questions({ subject, token, onBack, onFinish }) {
       <p className="timer">Vreme: {formatTime(timeElapsed)}</p>
       <button className="back-btn" onClick={onBack}>← Nazad</button>
 
-      {!questions.length ? (
-        <p style={{ textAlign: "center", marginTop: "20px" }}>
-          Nema dostupnih pitanja za ovaj predmet
-        </p>
-      ) : (
-        <ul className="questions-list">
-          {questions.map(q => (
-            <li key={q.question_id} className="question-card">
-              <p>{q.question_text}</p>
-              <ul className="answers-list">
-                {q.answers.map(a => {
-                  const selected = selectedAnswers[q.question_id]?.answer_id === a.answer_id;
-                  const correct = selectedAnswers[q.question_id]?.correct;
-
-                  return (
-                    <li
-                      key={a.answer_id}
-                      onClick={() => handleAnswerClick(q.question_id, a.answer_id)}
-                      className={`answer-item ${selected ? (correct ? "correct" : "wrong") : ""}`}
-                    >
-                      {a.answer_text}
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          ))}
+      <div className="question-card">
+        <p>{currentQuestion.question_text}</p>
+        <ul className="answers-list">
+          {currentQuestion.answers.map(a => {
+            const selected = userSelection.answerIds.includes(a.answer_id);
+            const correct = userSelection.correctAnswers?.includes(a.answer_id);
+            return (
+              <li
+                key={a.answer_id}
+                className={`answer-item ${showResult ? (correct ? "correct" : selected ? "wrong" : "") : ""}`}
+                onClick={() => handleAnswerClick(a.answer_id)}
+              >
+                <input
+                  type={currentQuestion.question_type === "multiple" ? "checkbox" : "radio"}
+                  name={`question_${currentQuestion.question_id}`}
+                  checked={selected}
+                  readOnly
+                />
+                <span>{a.answer_text}</span>
+              </li>
+            );
+          })}
         </ul>
-      )}
 
-      {allAnswered && (
-        <button className="finish-btn" onClick={handleFinishQuiz}>
-          Završi kviz
-        </button>
-      )}
+        {!showResult ? (
+          <button className="check-btn" onClick={handleCheckNext}>Proveri odgovor</button>
+        ) : (
+          <button className="next-btn" onClick={handleNextQuestion}>
+            {currentIndex + 1 < questions.length ? "Sledeće pitanje" : "Završi kviz"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,38 +1,51 @@
-// src/components/admin.js
+// Uvoz hook-ova iz React-a i CSS fajla
 import React, { useState, useEffect } from "react";
 import "../styles/admin.css";
 
 function Admin({ token, onBack }) {
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [questionText, setQuestionText] = useState("");
-  const [answers, setAnswers] = useState([{ text: "", correct: false }]);
-  const [questionType, setQuestionType] = useState("single"); // single ili multiple
-  const [message, setMessage] = useState("");
+  // State promenljive:
+  const [subjects, setSubjects] = useState([]); 
+  // lista svih predmeta (učitava se sa servera)
+  const [selectedSubject, setSelectedSubject] = useState(null); 
+  // predmet koji je trenutno izabran
+  const [questionText, setQuestionText] = useState(""); 
+  // tekst pitanja koje admin unosi
+  const [answers, setAnswers] = useState([{ text: "", correct: false }]); 
+  // lista odgovora na pitanje (svaki odgovor je objekat {text, correct})
+  const [questionType, setQuestionType] = useState("single"); 
+  // tip pitanja → "single" (jedan tačan) ili "multiple" (više tačnih)
+  const [message, setMessage] = useState(""); 
+  // poruka za uspeh/grešku
 
-  // Učitaj predmete
+  // useEffect → poziva se kada se komponenta učita ili se token promeni
   useEffect(() => {
     if (!token) return;
 
+    // Fetch predmeta sa servera
     fetch("http://localhost/kviz/api/get_subjects.php", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}` }, // prosleđujemo token kao header
     })
-      .then((res) => res.json())
-      .then((data) => setSubjects(data.subjects || data))
+      .then((res) => res.json()) // parsiramo JSON
+      .then((data) => setSubjects(data.subjects || data)) // snimamo predmete u state
       .catch((err) => console.error("Greška pri učitavanju predmeta:", err));
   }, [token]);
 
+  // Dodavanje novog polja za odgovor
   const addAnswerField = () =>
     setAnswers([...answers, { text: "", correct: false }]);
+
+  // Brisanje određenog odgovora
   const removeAnswerField = (index) =>
     setAnswers(answers.filter((_, i) => i !== index));
 
+  // Izmena teksta ili statusa "correct" za neki odgovor
   const handleAnswerChange = (index, field, value) => {
-    const updated = [...answers];
-    updated[index][field] = value;
-    setAnswers(updated);
+    const updated = [...answers]; // kopiramo postojeće odgovore
+    updated[index][field] = value; // menjamo odgovarajuće polje
+    setAnswers(updated); // snimamo novi niz u state
   };
 
+  // Slanje pitanja na server
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedSubject) return setMessage("Izaberite predmet");
@@ -45,26 +58,28 @@ function Admin({ token, onBack }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // opet token za autorizaciju
           },
           body: JSON.stringify({
-            subject_id: selectedSubject.subject_id,
-            question_text: questionText,
-            question_type: questionType,
-            answers,
+            subject_id: selectedSubject.subject_id, // ID predmeta
+            question_text: questionText, // tekst pitanja
+            question_type: questionType, // tip pitanja (single/multiple)
+            answers, // lista odgovora
           }),
         }
       );
 
-      // Ako status nije 2xx → baca grešku
+      // Ako odgovor servera NIJE OK (npr. 500 error)
       if (!res.ok) {
-        const text = await res.text(); // čita HTML/tekstualni odgovor
+        const text = await res.text();
         throw new Error(`HTTP ${res.status}: ${text}`);
       }
 
+      // Ako je sve OK, parsiramo JSON
       const data = await res.json();
       setMessage(data.message || "Nešto je pošlo po zlu");
 
+      // Ako je success → reset forme
       if (data.success) {
         setQuestionText("");
         setAnswers([{ text: "", correct: false }]);
@@ -78,11 +93,13 @@ function Admin({ token, onBack }) {
 
   return (
     <div className="admin-container">
+      {/* Dugme za povratak na Subjects */}
       <button className="back-btn" onClick={onBack}>
         ← Nazad
       </button>
       <h2>Admin Panel - Dodavanje pitanja</h2>
 
+      {/* Padajući meni za izbor predmeta */}
       <div className="form-group">
         <label>Izaberite predmet:</label>
         <select
@@ -101,6 +118,7 @@ function Admin({ token, onBack }) {
         </select>
       </div>
 
+      {/* Tip pitanja: Single ili Multiple Choice */}
       <div className="form-group">
         <label>Tip pitanja:</label>
         <label>
@@ -125,7 +143,9 @@ function Admin({ token, onBack }) {
         </label>
       </div>
 
+      {/* Forma za unos pitanja i odgovora */}
       <form onSubmit={handleSubmit}>
+        {/* Tekst pitanja */}
         <div className="form-group">
           <textarea
             placeholder="Tekst pitanja"
@@ -135,6 +155,7 @@ function Admin({ token, onBack }) {
           />
         </div>
 
+        {/* Dinamička lista odgovora */}
         {answers.map((a, index) => (
           <div key={index} className="form-group answer-group">
             <input
@@ -154,6 +175,7 @@ function Admin({ token, onBack }) {
               />{" "}
               Tačno
             </label>
+            {/* Dugme za brisanje odgovora (ako ima više od jednog) */}
             {answers.length > 1 && (
               <button
                 type="button"
@@ -166,6 +188,7 @@ function Admin({ token, onBack }) {
           </div>
         ))}
 
+        {/* Dugmad: dodaj odgovor i sačuvaj pitanje */}
         <div className="form-actions">
           <button type="button" className="add-btn" onClick={addAnswerField}>
             Dodaj odgovor
@@ -176,6 +199,7 @@ function Admin({ token, onBack }) {
         </div>
       </form>
 
+      {/* Poruka o uspehu/grešci */}
       {message && (
         <p className={message.includes("uspešno") ? "success-msg" : "error-msg"}>
           {message}

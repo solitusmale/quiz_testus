@@ -21,8 +21,9 @@ function Results({ results, timeElapsed, onBack }) {
         {results.map((r, idx) => (
           <li key={idx} className={`result-item ${r.correct ? "correct" : "wrong"}`}>
             <strong>Pitanje:</strong> {r.question_text} <br/>
-            <strong>Vaš odgovor:</strong> {r.selected_answer || "Niste odgovorili"} <br/>
+            <strong>Vaš odgovor:</strong> {r.selected_text || "Niste odgovorili"} <br/>
             <strong>Status:</strong> {r.correct ? "Tačno" : "Pogrešno"}
+
           </li>
         ))}
       </ul>

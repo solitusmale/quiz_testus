@@ -188,7 +188,25 @@ function Admin({ token, onBack }) {
             {questions.map(q=>(
               <li key={q.question_id}>
                 <strong>{q.question_text}</strong> ({q.question_type})
-                <button className="edit-btn" onClick={()=>setEditingQuestion(q)}>✏ Izmeni</button>
+                <button
+                className="edit-btn"
+                onClick={() => {
+                    // Mapiraj odgovore iz baze u {text, correct} format koji forma očekuje
+                    const answersFormatted = (q.answers || []).map(a => ({
+                    text: a.answer_text,             // iz baze dolazi kao answer_text
+                    correct: a.is_correct === 1 || a.is_correct === true // bool
+                    }));
+
+                    // Setuj editingQuestion sa normalizovanim odgovorima
+                    setEditingQuestion({
+                    ...q,
+                    answers: answersFormatted
+                    });
+                }}
+                >
+                ✏ Izmeni
+                </button>
+
                 <button className="delete-btn" onClick={()=>handleDelete(q.question_id)}>🗑 Obriši</button>
               </li>
             ))}

@@ -43,19 +43,17 @@ function Questions({ subject, token, onBack, onFinish }) {
   const handleAnswerClick = (answer_id) => {
     if (showResult) return;
 
-    // Single choice
     if (currentQuestion.question_type === "single") {
       setSelectedAnswers(prev => ({
         ...prev,
         [currentQuestion.question_id]: { answerIds: [answer_id] }
       }));
     } else {
-      // Multiple choice
+      const existing = prev => prev[currentQuestion.question_id]?.answerIds || [];
       setSelectedAnswers(prev => {
-        const existing = prev[currentQuestion.question_id]?.answerIds || [];
-        const updated = existing.includes(answer_id)
-          ? existing.filter(id => id !== answer_id)
-          : [...existing, answer_id];
+        const updated = existing(prev).includes(answer_id)
+          ? existing(prev).filter(id => id !== answer_id)
+          : [...existing(prev), answer_id];
         return {
           ...prev,
           [currentQuestion.question_id]: { answerIds: updated }
@@ -93,35 +91,34 @@ function Questions({ subject, token, onBack, onFinish }) {
     }
   };
 
-const handleNextQuestion = () => {
-  setShowResult(false);
-  if (currentIndex + 1 < questions.length) {
-    setCurrentIndex(currentIndex + 1);
-  } else {
-    // kraj kviza
-    const results = questions.map(q => {
-      const sel = selectedAnswers[q.question_id] || {};
-      const selectedIds = sel.answerIds || [];
-      const correctIds = sel.correctAnswers || [];
+  const handleNextQuestion = () => {
+    setShowResult(false);
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      // kraj kviza
+      const results = questions.map(q => {
+        const sel = selectedAnswers[q.question_id] || {};
+        const selectedIds = sel.answerIds || [];
+        const correctIds = sel.correctAnswers || [];
 
-      const selectedText = q.answers
-        .filter(a => selectedIds.includes(a.answer_id))
-        .map(a => a.answer_text)
-        .join(", ") || null;
+        const selectedText = q.answers
+          .filter(a => selectedIds.includes(a.answer_id))
+          .map(a => a.answer_text)
+          .join(", ") || null;
 
-      return {
-        question_id: q.question_id,
-        question_text: q.question_text,
-        selected_answers: selectedIds,
-        selected_text: selectedText,
-        correct_answers: correctIds,
-        correct: correctIds.length === selectedIds.length && correctIds.every(id => selectedIds.includes(id))
-      };
-    });
-    onFinish(results, timeElapsed);
-  }
-};
-
+        return {
+          question_id: q.question_id,
+          question_text: q.question_text,
+          selected_answers: selectedIds,
+          selected_text: selectedText,
+          correct_answers: correctIds,
+          correct: correctIds.length === selectedIds.length && correctIds.every(id => selectedIds.includes(id))
+        };
+      });
+      onFinish(results, timeElapsed);
+    }
+  };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -137,6 +134,17 @@ const handleNextQuestion = () => {
 
       <div className="question-card">
         <p>{currentQuestion.question_text}</p>
+
+        {/* Slika pitanja */}
+        {currentQuestion.image_url && (
+          <div className="question-image">
+            <img
+              src={`http://localhost/kviz/${currentQuestion.image_url}`}
+              alt="Pitanje"
+            />
+          </div>
+        )}
+
         <ul className="answers-list">
           {currentQuestion.answers.map(a => {
             const selected = userSelection.answerIds.includes(a.answer_id);

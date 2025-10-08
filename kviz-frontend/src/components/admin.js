@@ -13,6 +13,7 @@ function Admin({ token, onBack }) {
   const [answers, setAnswers] = useState([{ text: "", correct: false }]);
   const [questionType, setQuestionType] = useState("single");
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState(null);
 
   // Učitaj predmete
   useEffect(() => {
@@ -45,35 +46,39 @@ function Admin({ token, onBack }) {
   };
 
   // Submit dodavanja pitanja
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedSubject) return setMessage("Izaberite predmet");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!selectedSubject) return setMessage("Izaberite predmet");
 
-    try {
-      const res = await fetch("http://localhost/kviz/api/admin_add_question.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          subject_id: selectedSubject.subject_id,
-          question_text: questionText,
-          question_type: questionType,
-          answers,
-        }),
-      });
-      const data = await res.json();
-      setMessage(data.message || "Nešto je pošlo po zlu");
-      if (data.success) {
-        setQuestionText("");
-        setAnswers([{ text: "", correct: false }]);
-        setQuestionType("single");
-        loadQuestions(selectedSubject.subject_id);
-        setShowAddForm(false);
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage("Greška: " + err.message);
+  try {
+    const formData = new FormData();
+    formData.append("subject_id", selectedSubject.subject_id);
+    formData.append("question_text", questionText);
+    formData.append("question_type", questionType);
+    formData.append("answers", JSON.stringify(answers));
+    if (image) formData.append("image", image);
+
+    const res = await fetch("http://localhost/kviz/api/admin_add_question.php", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` }, // bez Content-Type, browser sam setuje
+      body: formData,
+    });
+
+    const data = await res.json();
+    setMessage(data.message || "Nešto je pošlo po zlu");
+    if (data.success) {
+      setQuestionText("");
+      setAnswers([{ text: "", correct: false }]);
+      setQuestionType("single");
+      setImage(null);
+      loadQuestions(selectedSubject.subject_id);
+      setShowAddForm(false);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setMessage("Greška: " + err.message);
+  }
+};
 
   // Delete pitanje
   const handleDelete = async (questionId) => {
@@ -177,6 +182,8 @@ function Admin({ token, onBack }) {
             <button type="button" className="add-btn" onClick={addAnswerField}>➕ Dodaj odgovor</button>
             <button type="submit" className="save-btn">💾 Sačuvaj pitanje</button>
           </div>
+          <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])}/>
+
         </form>
       )}
 
@@ -215,33 +222,89 @@ function Admin({ token, onBack }) {
       </div>
 
       {/* Modal edit forme */}
-      {editingQuestion && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Izmeni pitanje</h3>
-            <form onSubmit={handleEditSubmit}>
-              <textarea value={editingQuestion.question_text} onChange={e=>setEditingQuestion({...editingQuestion,question_text:e.target.value})} required/>
-              <div className="form-group">
-                <label>Tip pitanja:</label>
-                <label><input type="radio" name="editQuestionType" value="single" checked={editingQuestion.question_type==="single"} onChange={e=>setEditingQuestion({...editingQuestion,question_type:e.target.value})}/> Single Choice</label>
-                <label><input type="radio" name="editQuestionType" value="multiple" checked={editingQuestion.question_type==="multiple"} onChange={e=>setEditingQuestion({...editingQuestion,question_type:e.target.value})}/> Multiple Choice</label>
-              </div>
-              {editingQuestion.answers.map((a,i)=>(
-                <div key={i} className="form-group answer-group">
-                  <input type="text" value={a.text} onChange={e=>handleEditAnswerChange(i,"text",e.target.value)} required/>
-                  <label><input type="checkbox" checked={a.correct} onChange={e=>handleEditAnswerChange(i,"correct",e.target.checked)}/> Tačno</label>
-                  {editingQuestion.answers.length>1 && <button type="button" className="remove-btn" onClick={()=>removeEditAnswerField(i)}>Obriši</button>}
+            {editingQuestion && (
+            <div className="modal-overlay">
+                <div className="modal">
+                <h3>Izmeni pitanje</h3>
+                <form onSubmit={handleEditSubmit} encType="multipart/form-data">
+                    <textarea
+                    value={editingQuestion.question_text}
+                    onChange={e => setEditingQuestion({ ...editingQuestion, question_text: e.target.value })}
+                    required
+                    />
+
+                    <div className="form-group">
+                    <label>Tip pitanja:</label>
+                    <label>
+                        <input
+                        type="radio"
+                        name="editQuestionType"
+                        value="single"
+                        checked={editingQuestion.question_type === "single"}
+                        onChange={e => setEditingQuestion({ ...editingQuestion, question_type: e.target.value })}
+                        /> Single Choice
+                    </label>
+                    <label>
+                        <input
+                        type="radio"
+                        name="editQuestionType"
+                        value="multiple"
+                        checked={editingQuestion.question_type === "multiple"}
+                        onChange={e => setEditingQuestion({ ...editingQuestion, question_type: e.target.value })}
+                        /> Multiple Choice
+                    </label>
+                    </div>
+
+                    {/* Odgovori */}
+                    {editingQuestion.answers.map((a, i) => (
+                    <div key={i} className="form-group answer-group">
+                        <input
+                        type="text"
+                        value={a.text}
+                        onChange={e => handleEditAnswerChange(i, "text", e.target.value)}
+                        required
+                        />
+                        <label>
+                        <input
+                            type="checkbox"
+                            checked={a.correct}
+                            onChange={e => handleEditAnswerChange(i, "correct", e.target.checked)}
+                        /> Tačno
+                        </label>
+                        {editingQuestion.answers.length > 1 && (
+                        <button type="button" className="remove-btn" onClick={() => removeEditAnswerField(i)}>Obriši</button>
+                        )}
+                    </div>
+                    ))}
+
+                    <div className="form-actions">
+                    <button type="button" className="add-btn" onClick={addEditAnswerField}>➕ Dodaj odgovor</button>
+                    </div>
+
+                    {/* Slika */}
+                    <div className="form-group">
+                    {editingQuestion.image_url && (
+                        <div>
+                        <p>Trenutna slika:</p>
+                        <img src={`http://localhost/kviz/${editingQuestion.image_url}`} alt="Pitanje" style={{ maxWidth: "200px" }} />
+                        </div>
+                    )}
+                    <label>Izmeni/dodaj sliku:</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => setEditingQuestion({ ...editingQuestion, newImage: e.target.files[0] })}
+                    />
+                    </div>
+
+                    <div className="form-actions">
+                    <button type="submit" className="save-btn">💾 Sačuvaj izmene</button>
+                    <button type="button" className="cancel-btn" onClick={() => setEditingQuestion(null)}>✖ Otkaži</button>
+                    </div>
+                </form>
                 </div>
-              ))}
-              <div className="form-actions">
-                <button type="button" className="add-btn" onClick={addEditAnswerField}>➕ Dodaj odgovor</button>
-                <button type="submit" className="save-btn">💾 Sačuvaj izmene</button>
-                <button type="button" className="cancel-btn" onClick={()=>setEditingQuestion(null)}>✖ Otkaži</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+            )}
 
       {message && <p className={message.includes("uspešno")?"success-msg":"error-msg"}>{message}</p>}
     </div>

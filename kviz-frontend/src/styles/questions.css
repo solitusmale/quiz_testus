@@ -101,3 +101,17 @@
 .delete-btn {
   margin-left: auto; /* gura ga skroz desno */
 }
+/* src/styles/questions.css */
+
+.question-image {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.question-image img {
+  width: 100%;           /* zauzima punu širinu kartice */
+  max-height: 500px;     /* maksimalna visina slike */
+  object-fit: cover;     /* slika popunjava prostor proporcionalno */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}

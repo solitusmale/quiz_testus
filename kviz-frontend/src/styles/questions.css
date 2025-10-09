@@ -98,11 +98,6 @@
   border-bottom: 1px solid #ddd;
 }
 
-.delete-btn {
-  margin-left: auto; /* gura ga skroz desno */
-}
-/* src/styles/questions.css */
-
 .question-image {
   text-align: center;
   margin: 15px 0;

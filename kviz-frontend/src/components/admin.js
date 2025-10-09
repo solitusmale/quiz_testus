@@ -181,8 +181,9 @@ const handleSubmit = async (e) => {
           <div className="form-actions">
             <button type="button" className="add-btn" onClick={addAnswerField}>➕ Dodaj odgovor</button>
             <button type="submit" className="save-btn">💾 Sačuvaj pitanje</button>
+            <input type="file" className="image-upload"  accept="image/*" onChange={e => setImage(e.target.files[0])}/>
           </div>
-          <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])}/>
+          
 
         </form>
       )}
@@ -195,6 +196,7 @@ const handleSubmit = async (e) => {
             {questions.map(q=>(
               <li key={q.question_id}>
                 <strong>{q.question_text}</strong> ({q.question_type})
+                <div className="question-actions">
                 <button
                 className="edit-btn"
                 onClick={() => {
@@ -215,6 +217,7 @@ const handleSubmit = async (e) => {
                 </button>
 
                 <button className="delete-btn" onClick={()=>handleDelete(q.question_id)}>🗑 Obriši</button>
+                </div>
               </li>
             ))}
           </ul>

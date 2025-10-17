@@ -1,6 +1,6 @@
-// src/components/Results.js
+// src/components/Results.jsx
 import React from "react";
-import "../styles/results.css";
+import "../../styles/results.css";
 
 function Results({ results, timeElapsed, onBack }) {
   const correctCount = results.filter(r => r.correct).length;

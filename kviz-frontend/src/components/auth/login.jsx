@@ -1,7 +1,7 @@
 // src/components/Login.js
 import React, { useState } from "react";
-import "../styles/login.css";
-import Register from "./register"; // import Register
+import "../../styles/login.css";
+import Register from "./Register.jsx"; // import Register
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");

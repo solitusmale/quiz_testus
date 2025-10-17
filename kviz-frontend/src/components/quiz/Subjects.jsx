@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../styles/subjects.css";
+import "../../styles/subjects.css";
 
 function Subjects({ token, onSelect, userRole, onShowAdmin }) {
   const [subjects, setSubjects] = useState([]);

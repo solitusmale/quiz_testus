@@ -1,20 +1,24 @@
-// src/components/Questions.js
+// src/components/quiz/Questions.jsx
 import React, { useState, useEffect } from "react";
-import "../styles/questions.css";
+import { useNavigate, useParams } from "react-router-dom";
+import "../../styles/questions.css";
 
-function Questions({ subject, token, onBack, onFinish }) {
+function Questions({ token }) {
+  const { subjectId } = useParams(); // uzimamo subject iz URL-a
+  const navigate = useNavigate();
+
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResult, setShowResult] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0); // tajmer u sekundama
+  const [timeElapsed, setTimeElapsed] = useState(0);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const res = await fetch(
-          `http://localhost/kviz/api/get_questions.php?subject_id=${subject.subject_id}&token=${token}`
+          `http://localhost/kviz/api/get_questions.php?subject_id=${subjectId}&token=${token}`
         );
         const data = await res.json();
         setQuestions(data.questions || []);
@@ -24,15 +28,12 @@ function Questions({ subject, token, onBack, onFinish }) {
         setLoading(false);
       }
     };
+
     fetchQuestions();
 
-    // start tajmera
-    const timer = setInterval(() => {
-      setTimeElapsed(prev => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer); // stop tajmera kad komponenta unmount
-  }, [subject, token]);
+    const timer = setInterval(() => setTimeElapsed(prev => prev + 1), 1000);
+    return () => clearInterval(timer);
+  }, [subjectId, token]);
 
   if (loading) return <p style={{ textAlign: "center" }}>Učitavanje pitanja...</p>;
   if (!questions.length) return <p style={{ textAlign: "center" }}>Nema pitanja za ovaj predmet</p>;
@@ -49,11 +50,11 @@ function Questions({ subject, token, onBack, onFinish }) {
         [currentQuestion.question_id]: { answerIds: [answer_id] }
       }));
     } else {
-      const existing = prev => prev[currentQuestion.question_id]?.answerIds || [];
       setSelectedAnswers(prev => {
-        const updated = existing(prev).includes(answer_id)
-          ? existing(prev).filter(id => id !== answer_id)
-          : [...existing(prev), answer_id];
+        const existing = prev[currentQuestion.question_id]?.answerIds || [];
+        const updated = existing.includes(answer_id)
+          ? existing.filter(id => id !== answer_id)
+          : [...existing, answer_id];
         return {
           ...prev,
           [currentQuestion.question_id]: { answerIds: updated }
@@ -96,12 +97,11 @@ function Questions({ subject, token, onBack, onFinish }) {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      // kraj kviza
+      // kraj kviza → preusmeravamo na /results
       const results = questions.map(q => {
         const sel = selectedAnswers[q.question_id] || {};
         const selectedIds = sel.answerIds || [];
         const correctIds = sel.correctAnswers || [];
-
         const selectedText = q.answers
           .filter(a => selectedIds.includes(a.answer_id))
           .map(a => a.answer_text)
@@ -116,32 +116,29 @@ function Questions({ subject, token, onBack, onFinish }) {
           correct: correctIds.length === selectedIds.length && correctIds.every(id => selectedIds.includes(id))
         };
       });
-      onFinish(results, timeElapsed);
+
+      navigate("/results", { state: { results, timeElapsed } });
     }
   };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2,'0')}`;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   return (
     <div className="questions-container">
-      <h2>{subject.name}</h2>
+      <h2>{currentQuestion.subject_name || "Kviz"}</h2>
       <p className="timer">Vreme: {formatTime(timeElapsed)}</p>
-      <button className="back-btn" onClick={onBack}>← Nazad</button>
+      <button className="back-btn" onClick={() => navigate("/subjects")}>← Nazad</button>
 
       <div className="question-card">
         <p>{currentQuestion.question_text}</p>
 
-        {/* Slika pitanja */}
         {currentQuestion.image_url && (
           <div className="question-image">
-            <img
-              src={`http://localhost/kviz/${currentQuestion.image_url}`}
-              alt="Pitanje"
-            />
+            <img src={`http://localhost/kviz/${currentQuestion.image_url}`} alt="Pitanje" />
           </div>
         )}
 

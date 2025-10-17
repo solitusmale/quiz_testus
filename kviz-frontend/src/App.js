@@ -1,96 +1,127 @@
 // src/App.js
 import React, { useState } from "react";
-import LandingPage from "./components/landingpage";
-import Login from "./components/login";
-import Subjects from "./components/subjects";
-import Questions from "./components/questions";
-import Results from "./components/results";
-import Admin from "./components/admin";
-import Navbar from "./components/navbar"; // Dodali smo navbar
-
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./styles/app.css";
+
+// 🔹 Komponente
+import Navbar from "./components/common/ui/Navbar.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SubjectsPage from "./pages/SubjectsPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import Questions from "./components/quiz/Questions.jsx";
+import ResultsPage from "./pages/ResultsPage.jsx";
+
+
+
+
 
 function App() {
   const [user, setUser] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
   const [quizResults, setQuizResults] = useState(null);
   const [quizTime, setQuizTime] = useState(0);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [page, setPage] = useState("landing"); // menja showLanding
 
+  const navigate = useNavigate();
+
+  // 🔹 Login / Logout
   const handleLogin = (loggedInUser) => {
     setUser(loggedInUser);
-    setPage("subjects");
+    navigate("/subjects");
   };
 
   const handleLogout = () => {
     setUser(null);
-    setPage("landing");
-  };
-
-  const handleSelectSubject = (subject) => setSelectedSubject(subject);
-
-  const handleBackToSubjects = () => {
-    setSelectedSubject(null);
     setQuizResults(null);
-    setShowAdminPanel(false);
-    setPage("subjects");
+    setQuizTime(0);
+    navigate("/");
   };
 
-  const handleFinishQuiz = (results, timeElapsed) => {
-    setQuizResults(results);
-    setQuizTime(timeElapsed);
+  // 🔹 Povratak na listu predmeta
+  const handleBackToSubjects = () => {
+    setQuizResults(null);
+    navigate("/subjects");
   };
 
   return (
     <div className="app-container">
-      {/* Navbar stalno vidljiv */}
-      <Navbar user={user} onNavigate={setPage} onLogout={handleLogout} />
+      <Navbar user={user} onLogout={handleLogout} />
 
-      {/* Rute logika */}
-      {page === "landing" && (
-        <LandingPage
-          onLoginClick={() => setPage("login")}
-          onBrowseClick={() => setPage("subjects")}
+      <Routes>
+        {/* 🏠 Početna */}
+        <Route
+          path="/"
+          element={
+            <HomePage
+              onLoginClick={() => navigate("/login")}
+              onBrowseClick={() => navigate("/subjects")}
+            />
+          }
         />
-      )}
 
-      {page === "login" && !user && <Login onLogin={handleLogin} />}
-
-      {page === "subjects" && user && !selectedSubject && !showAdminPanel && (
-        <Subjects
-          token={user.api_token}
-          onSelect={handleSelectSubject}
-          userRole={user.role}
-          onShowAdmin={() => setShowAdminPanel(true)}
+        {/* 🔑 Prijava */}
+        <Route
+          path="/login"
+          element={<LoginPage onLogin={handleLogin} />}
         />
-      )}
 
-      {showAdminPanel && page === "admin" && user?.role === "admin" && (
-        <Admin token={user.api_token} onBack={handleBackToSubjects} />
-      )}
-
-      {selectedSubject && !quizResults && (
-        <Questions
-          subject={selectedSubject}
-          token={user.api_token}
-          onBack={handleBackToSubjects}
-          onFinish={handleFinishQuiz}
+        {/* 📚 Predmeti */}
+        <Route
+          path="/subjects"
+          element={
+            user ? (
+              <SubjectsPage
+                token={user.api_token}
+                userRole={user.role}
+                onSelect={(subject) => navigate(`/questions/${subject.subject_id}`)}
+                onShowAdmin={() => navigate("/admin")}
+              />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
-      )}
 
-      {quizResults && (
-        <Results
-          results={quizResults}
-          timeElapsed={quizTime}
-          onBack={handleBackToSubjects}
+        {/* 🧑‍💼 Admin panel */}
+        <Route
+          path="/admin"
+          element={
+            user?.role === "admin" ? (
+              <AdminPage onBack={handleBackToSubjects} token={user.api_token} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
-      )}
 
-      {page === "tokens" && <div className="p-6">Ovde ide kupovina tokena 💰</div>}
-      {page === "profile" && <div className="p-6">Korisnički profil</div>}
+        {/* ❓ Pitanja */}
+        <Route
+          path="/questions/:subjectId"
+          element={<Questions token={user?.api_token} />}
+        />
+
+        {/* 🧾 Rezultati */}
+        <Route
+          path="/results"
+          element={
+            quizResults ? (
+              <ResultsPage
+                results={quizResults}
+                timeElapsed={quizTime}
+                onBack={handleBackToSubjects}
+              />
+            ) : (
+              <Navigate to="/subjects" />
+            )
+          }
+        />
+
+        {/* 🌐 Nepostojeća ruta */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </div>
   );
 }
+
+
 
 export default App;

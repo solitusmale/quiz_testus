@@ -9,27 +9,27 @@ class Counter extends Component {
             counter: [
                 {
                     id: 1,
-                    title: '200',
-                    suffix: 'k',
-                    text: 'Students'
+                    title: '20',
+                    suffix: '+',
+                    text: 'Predmeta'
                 },
                 {
                     id: 2,
-                    title: '1200',
-                    suffix: '%',
-                    text: 'Online Courses'
+                    title: '1000',
+                    suffix: '+',
+                    text: 'Pitanja'
                 },
-                {
-                    id: 3,
-                    title: '2256',
-                    suffix: '',
-                    text: 'Finished Seasons'
-                },
+                // {
+                //     id: 3,
+                //     title: '2256',
+                //     suffix: '',
+                //     text: 'Finished Seasons'
+                // },
                 {
                     id: 4,
                     title: '100',
                     suffix: '%',
-                    text: 'Satisfaction'
+                    text: 'Zadovoljnih korisnika'
                 }
             ]
         }

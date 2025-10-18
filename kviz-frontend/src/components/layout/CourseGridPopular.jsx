@@ -60,8 +60,8 @@ class CourseGridPopular extends Component {
                 <div className="row justify-content-center">
                     <div className="col-xl-8">
                         <div className="section-heading mb-70 text-center">
-                            <h2 className="font-lg">Popular Courses</h2>
-                            <p>Discover Your Perfect Program In Our Courses.</p>
+                            <h2 className="font-lg">Popularni Kvizovi</h2>
+                            <p>Trenutno najpopularniji kvizovi</p>
                         </div>
                     </div>
                 </div>

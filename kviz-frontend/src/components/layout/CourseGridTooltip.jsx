@@ -9,7 +9,7 @@ class CourseGrid01 extends Component {
             courses: [
                 {
                     id: 1,
-                    author: 'Jpsephin',
+                    author: 'Admin',
                     price: '$200 ',
                     review: '4.5 ',
                     reviewCount: '40',
@@ -18,12 +18,12 @@ class CourseGrid01 extends Component {
                     lessons :  '97 ',
                     img :  'assets/images/course/img_06.jpg',
                     authorImg :  'assets/images/course/course-2.jpg',
-                    title: ' Data Competitive Strategy law & Organization ',
-                    desc: ' Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero, culpa. At voluptatem autem ipsam deleniti',
+                    title: ' Računarske mreže 1. kolokvijum',
+                    desc: ' Preko 100 pitanja iz oblasti računarskih mreža sa rešenjima u formatu kviza',
                 },
                 {
                     id: 2,
-                    author: 'Mikel',
+                    author: 'Admin',
                     price: '$300',
                     review: '4.5 ',
                     reviewCount: '40',
@@ -32,14 +32,14 @@ class CourseGrid01 extends Component {
                     lessons :  '97 ',
                     img :  'assets/images/course/img_02.jpg',
                     authorImg :  'assets/images/course/course-2.jpg',
-                    title: 'Data Competitive Strategy law & Organization 2',
-                    desc: ' Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero, culpa. At voluptatem autem ipsam deleniti',
+                    title: 'Baze podataka 1. kolokvijum',
+                    desc: ' Preko 100 pitanja iz oblasti baza podataka sa rešenjima u formatu kviza',
 
                 },
                 {
                     id: 3,
-                    author: 'John',
-                    price: '$450',
+                    author: 'Admin',
+                    price: 'RSD3000',
                     review: '4.5 ',
                     reviewCount: '40',
                     students :  '41',
@@ -47,8 +47,8 @@ class CourseGrid01 extends Component {
                     lessons :  '97 ',
                     img :  'assets/images/course/img_03.jpg',
                     authorImg :  'assets/images/course/course-2.jpg',
-                    title: ' Data Competitive Strategy law & Organization 3',
-                    desc: ' Lorem ipsum, dolor sit amet consectetur adipisicing elit. Libero, culpa. At voluptatem autem ipsam deleniti',
+                    title: ' Osnovi programiranja 1. kolokvijum',
+                    desc: ' Preko 100 pitanja iz oblasti programiranja sa rešenjima u formatu kviza',
 
                 }
             ]
@@ -63,8 +63,8 @@ class CourseGrid01 extends Component {
                 <div className="row justify-content-center">
                     <div className="col-xl-8">
                         <div className="section-heading mb-70 text-center">
-                            <h2 className="font-lg">Popular Courses</h2>
-                            <p>Discover Your Perfect Program In Our Courses.</p>
+                            <h2 className="font-lg">Popularni kvizovi</h2>
+                            <p>Trenutno najpopularniji kvizovi</p>
                         </div>
                     </div>
                 </div>

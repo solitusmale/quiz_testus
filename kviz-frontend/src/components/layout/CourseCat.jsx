@@ -9,34 +9,29 @@ class CourseCat01 extends Component {
             category: [
                 {
                     id: 1,
-                    title: 'Data Science & Analytics',
-                    img :  'assets/images/icon/icon1.png',
+                    title: 'Prva godina',
+                    img :  'assets/images/icon/Roman1.png',
                     extraClassName: 'bg-1',
                 },
                 {
                     id: 2,
-                    title: 'Artificial Intellegence',
-                    img :  'assets/images/icon/icon2.png',
+                    title: 'Druga godina',
+                    img :  'assets/images/icon/Roman2.png',
                     extraClassName: 'bg-2',
                 },
                 {
                     id: 3,
-                    title: 'Algebra Math calculation',
-                    img :  'assets/images/icon/icon6.png',
+                    title: 'Treća godina',
+                    img :  'assets/images/icon/Roman3.png',
                     extraClassName: 'bg-3',
                 },
                 {
                     id: 4,
-                    title: 'Web Development',
-                    img :  'assets/images/icon/icon4.png',
+                    title: 'Četvrta godina',
+                    img :  'assets/images/icon/Roman4.png',
                     extraClassName: 'bg-4',
                 },
-                {
-                    id: 5,
-                    title: 'Digital Marketing & SEO',
-                    img :  'assets/images/icon/icon6.png',
-                    extraClassName: 'bg-5',
-                },
+                
                 
             ]
         }
@@ -51,8 +46,8 @@ class CourseCat01 extends Component {
                     <div className="row mb-70 justify-content-center">
                         <div className="col-xl-8">
                             <div className="section-heading text-center">
-                                <h2 className="font-lg">Categories you want to learn</h2>
-                                <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam</p>
+                                <h2 className="font-lg">Pretraga po godinama</h2>
+                                <p>Izaberite godinu studija za koju želite da pretražujete kurseve</p>
                             </div>
                         </div>
                     </div>

@@ -2997,7 +2997,8 @@ Course category
   margin: 0 auto 20px;
 }
 .single-course-category.style-3 .course-cat-icon img {
-  width: 45px;
+  /* width: 45px; */
+  vertical-align: top !important;
   display: inline-block;
 }
 .single-course-category.style-3 .course-cat-title {
